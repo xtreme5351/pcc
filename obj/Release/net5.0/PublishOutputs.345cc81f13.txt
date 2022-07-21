@@ -1,0 +1,5 @@
+/Users/pc/Code/C#/Finals/CompilerFinal/pcc
+/Users/pc/Code/C#/Finals/CompilerFinal/pcc.dll
+/Users/pc/Code/C#/Finals/CompilerFinal/pcc.deps.json
+/Users/pc/Code/C#/Finals/CompilerFinal/pcc.runtimeconfig.json
+/Users/pc/Code/C#/Finals/CompilerFinal/pcc.pdb

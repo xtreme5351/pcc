@@ -1,0 +1,16 @@
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc.deps.json
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc.runtimeconfig.json
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc.runtimeconfig.dev.json
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc.dll
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc.pdb
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.csproj.AssemblyReference.cache
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.GeneratedMSBuildEditorConfig.editorconfig
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.AssemblyInfoInputs.cache
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.AssemblyInfo.cs
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.csproj.CoreCompileInputs.cache
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.dll
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/ref/pcc.dll
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.pdb
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/pcc.genruntimeconfig.cache
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/bin/Debug/net5.0/pcc
+/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/obj/Debug/net5.0/refint/pcc.dll

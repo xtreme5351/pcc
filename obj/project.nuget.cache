@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Rk6TW7C01tlOZfZn15kusL+MBWkgcjek2fvBV7BEF72AiPduFgC5+OkfIoZadO3OFckHz9TI6YVWFfi6+YQ9oQ==",
+  "success": true,
+  "projectFilePath": "/Users/pc/Projects/AVeryCoolCompiler/AVeryCoolCompiler/pcc.csproj",
+  "expectedPackageFiles": [
+    "/Users/pc/.nuget/packages/microsoft.aspnetcore.app.ref/5.0.0/microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
+    "/Users/pc/.nuget/packages/microsoft.netcore.app.host.osx-x64/5.0.17/microsoft.netcore.app.host.osx-x64.5.0.17.nupkg.sha512",
+    "/Users/pc/.nuget/packages/microsoft.netcore.app.ref/5.0.0/microsoft.netcore.app.ref.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
