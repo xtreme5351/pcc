@@ -1,5 +1,5 @@
 # pcc
-My handmade compiler.
+My handmade compiler - stands for Pranav's Cool Compiler.
 
 Basic variable assignment works in theory.
 Memory actually needs to be allocated and is a work in progress.
