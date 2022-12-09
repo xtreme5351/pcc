@@ -1,123 +1,132 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-
 namespace pcc
 {
-    class LexicalAnalyzer : Program
+    class SemanticAnalyzer : Program
     {
-        public LexicalAnalyzer(string[] inputArgs)
+        public static string SymbolTableTypeLookup(string item)
         {
-            parser = new(inputArgs);
-            parser.CheckInputs();
-            rawData = parser.GetInputFileData();
-            tokeniser = new(rawData);
-            rawTokenStream = tokeniser.CreateTokenStream();
-        }
-
-        // A method that simply flattens the raw token stream which is a 2D list of tuples into a 1D list of tuples for easier processing.
-        private static List<(string, string)> FlattenTokenStream(List<List<(string, string)>> toFlatten)
-        {
-            List<(string, string)> flattenedStream = new();
-            foreach (List<(string, string)> row in toFlatten)
+            string final = "~";
+            foreach ((string, string, string, string, string) record in symbolTable)
             {
-                foreach ((string, string) column in row)
+                if (record.Item1 == item)
                 {
-                    flattenedStream.Add(column);
+                    return record.Item2;
                 }
             }
-            return flattenedStream;
+            return final;
         }
 
-        public List<(string, string, string, string, string)> CreateSymbolTable()
+        // This is basically a struct.
+        // Here is the implementation of my genius, the orchard.
+        // Each node in the graph can have a list of other assignment trees and is called the orchard.
+        // It is an optional child to each node.
+        // In theory, you should be able to dispatch the traversal of the orchard to another process
+        // e.g. to another core (paralell processing) as this is just memory assignment
+        public static ParseNode BuildDataBucket(int level, int startLine)
         {
-            // This is why the flattener is needed.
-            // Makes the symbol table creation infintely easier and arguably faster.
-            tokenStream = FlattenTokenStream(rawTokenStream);
-
-            // The following attributes are stored in the symbol table:
-            // Lexeme, Type, Value, Class, Scope
-            List<(string, string, string, string, string)> table = new();
-
-            foreach ((string, string) token in tokenStream)
+            ParseNode root = new("Databucket", "Databucket", "{}");
+            string variableName = rawTokenStream[level][2].Item2;
+            root.AssignLeftNode(new ParseNode("Variable", "foobar", variableName));
+            List<ParseNode> dataItems = new();
+            int endLine = 0;
+            for (int i = startLine; i < rawTokenStream.Count; i++)
             {
-                if (token.Item1 == "variable")
+                if (rawTokenStream[i][0].Equals(("separator", "}")))
                 {
-                    table.Add((token.Item2, DiscoverTokenType(token), DiscoverTokenValue(token, ("assignment", "="), 1), DiscoverTokenClass(token), DiscoverTokenScope(token)));
+                    endLine = i;
+                    break;
                 }
             }
-            return table;
+            List<List<(string, string)>> localScope = rawTokenStream.GetRange(startLine + 1, endLine - startLine - 1);
+            foreach (List<(string, string)> assignmentLine in localScope)
+            {
+                int index = 0;
+                foreach ((string, string) token in assignmentLine)
+                {
+                    if (token.Item1 == "variable")
+                    {
+                        index = assignmentLine.IndexOf(token);
+                    }
+                }
+                dataItems.Add(BuildAssignmentTree(assignmentLine, rawTokenStream.IndexOf(assignmentLine), index));
+            }
+            root.orchard = dataItems;
+            return root;
         }
 
-        private string DiscoverTokenValue((string, string) tokenToDiscover, (string, string) tokenComparator, int n)
+        public static ParseNode BuildAssignmentTree(List<(string, string)> line, int level, int variableN)
         {
-            int index = tokenStream.IndexOf(tokenToDiscover);
+            // NOT FULLY WORKING AS DOESNT WORK FOR let x = 1 + 2 + 3 or more arithmetic
+            ParseNode root = new("Assignment", "Assignment", "=");
+            string variableName = rawTokenStream[level][variableN].Item2;
+            root.AssignLeftNode(new ParseNode("Variable", SymbolTableTypeLookup(variableName), variableName));
+            //Console.WriteLine(root.left.value + root.left.type);
+
+            Regex regex = new(@"[\/\+\-\*]");
+            Match match = regex.Match(rawData[level]);
+            string operatorIndex = match.Value;
             try
             {
-                if (tokenStream[index + n] == tokenComparator)
+                ParseNode operatorNode = new("Operator", "Arithmetic", line[Int32.Parse(operatorIndex)].Item2);
+                operatorNode.AssignLeftNode(new ParseNode("Value", root.type, line[Int32.Parse(operatorIndex) - 1].Item2));
+                operatorNode.AssignRightNode(new ParseNode("Value", root.type, line[Int32.Parse(operatorIndex) + 1].Item2));
+                root.AssignRightNode(operatorNode);
+            }
+            catch
+            {
+                root.AssignRightNode(new ParseNode("Value", root.type, line[variableN + 2].Item2));
+            }
+            return root;
+        }
+
+        public static void TraverseTreeInorder(ParseNode Root)
+        {
+            if (Root != null)
+            {
+                TraverseTreeInorder(Root.left);
+                if (Root.orchard != null)
                 {
-                    return tokenStream[index + (n + 1)].Item2;
+                    foreach (ParseNode node in Root.orchard)
+                    {
+                        TraverseTreeInorder(node);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(Root.value + " ");
+                }
+                TraverseTreeInorder(Root.right);
+            }
+        }
+
+        public List<ParseNode> BuildParseGraph()
+        {
+            List<ParseNode> ParseGraph = new();
+            foreach(List<(string, string)> line in rawTokenStream)
+            {
+                int lineLevel = rawTokenStream.IndexOf(line);
+                foreach ((string, string) token in line)
+                {
+                    int index = line.IndexOf(token);
+                    switch (token.Item1)
+                    {
+                        case "variable":
+                            ParseGraph.Add(BuildAssignmentTree(line, lineLevel, index));
+                            break;
+
+                        case "databucket":
+                            BuildDataBucket(lineLevel, rawTokenStream.IndexOf(line));
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
-            // TTD: CATCH PRINT TO DEBUG LOG
-            catch { };
-            // RESOLVE FOR CLASSES BUT NOT NOW
-            return "nil";
-        }
-
-        private string DiscoverTokenClass((string, string) tokenToDiscover)
-        {
-            // Implement classes later, for now, everything is global
-            //int index = tokenStream.IndexOf(tokenToDiscover);
-            //List<(string, string)> before = new();
-            //for (int i = 0; i < index; i++)
-            //{
-            //    before.Add(tokenStream[i]);
-            //}
-            //Predicate<(string, string)> condition = MatchToken;
-            //List<(string, string)> temp = before.FindAll(condition);
-            //if (temp.Count == 0)
-            //{
-            //    return "global";
-            //}
-            // return DiscoverTokenValue(tokenToDiscover, tokenStream[tokenStream.IndexOf(temp[^1])], 0);
-            if (tokenToDiscover.Item1 == "variable")
-            {
-                return "global";
-            }
-            // No Valid Class
-            return "nvc";
-        }
-
-        private static bool MatchToken((string, string) input)
-        {
-            return input.Item1 == "class";
-        }
-
-        private string DiscoverTokenScope((string, string) tokenToDiscover)
-        {
-            // Implement scope later, for now everything is also globally scoped.
-            if (tokenToDiscover.Item1 == "variable")
-            {
-                return "global";
-            }
-            // No Valid Scope
-            return "nvs";
-        }
-
-        private string DiscoverTokenType((string, string) tokenToDiscover)
-        {
-            int index = tokenStream.IndexOf(tokenToDiscover);
-            try
-            {
-                if (tokenStream[index - 1].Item1 == "type")
-                {
-                    return tokenStream[index - 1].Item2;
-                }
-            }
-            catch { };
-            return "var";
+            return ParseGraph;
         }
     }
 }
