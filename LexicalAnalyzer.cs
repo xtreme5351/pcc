@@ -102,6 +102,9 @@ namespace pcc
             }
         }
 
+        // Method to build the parse graph of the system. This is no longer is a parse tree as there is a hierarchy
+        // But there is no strict requirement of <= two children nodes. Instead, a child can be an orchard.
+        // Done through the identifiction of the variable type before.
         public List<ParseNode> BuildParseGraph()
         {
             List<ParseNode> ParseGraph = new();
